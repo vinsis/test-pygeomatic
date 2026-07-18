@@ -5,3 +5,6 @@ jobs:
   publish:
     permissions: {contents: write}
     uses: TinyVolt/pygeomatic/.github/workflows/publish-articles.yml@main
+    with:
+      # This is the default extension loaded in tiny volt, so it is also the default extension that pygeomatic uses.
+      extensions: https://tinyvolt.github.io/geomatic-math-extensions/manifest.json
