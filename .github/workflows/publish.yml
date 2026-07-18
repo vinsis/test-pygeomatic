@@ -1,0 +1,7 @@
+name: Publish articles
+on:
+  push: {branches: [main]}
+jobs:
+  publish:
+    permissions: {contents: write}
+    uses: TinyVolt/pygeomatic/.github/workflows/publish-articles.yml@main
