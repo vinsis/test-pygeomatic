@@ -1,6 +1,8 @@
 One can assign an `id` to a latex string using the format `[#id] <latex string>`:
 
-$$[#integral] \int_a^b x^2 \, dx$$
+$$
+%id:integral
+\int_a^b x^2 \, dx$$
 
 Then in the `pygeomatic` code fence, one can bind a variable to the latex:
 
