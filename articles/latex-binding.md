@@ -24,7 +24,7 @@ $$
 r = gm.scalar(0)
 c = gm.scalar(0)
 M = gm.tex("M")
-M.highlight(rows == r)
+M.highlight(gm.rows == r)
 ```
 
 Move it: {row 1}(r = gm.scalar(1)) · {row 2}(r = gm.scalar(2))
