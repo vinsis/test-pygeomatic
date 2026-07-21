@@ -42,12 +42,6 @@ M[r1:, c1:].highlight(color="blue")
 ---
 
 
-```pygeomatic
-r2 = gm.scalar(0)
-c3 = gm.scalar(2)
-r3 = gm.scalar(1)
-```
-
 $$
 % id: matmul
 A = \begin{pmatrix} a & b & c & d \\ c & d & e & f \end{pmatrix}
@@ -57,6 +51,9 @@ $$
 
 ```pygeomatic
 f = gm.tex("matmul")
+r2 = gm.scalar(0)
+c3 = gm.scalar(2)
+r3 = gm.scalar(1)
 f.highlight(gm.rows == r2)
 f.highlight(gm.rows == r3, matrix = 1)
 f[:, :c3].highlight(color="blue", matrix = 1)
