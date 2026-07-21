@@ -33,9 +33,9 @@ Move it: {row 1}(r = gm.scalar(1)) · {row 2}(r = gm.scalar(2))
 
 ```pygeomatic
 gm.clear()
-r = gm.scalar(0)
-c = gm.scalar(0)
+r1 = gm.scalar(0)
+c1 = gm.scalar(0)
 M = gm.tex("M")
-M[r:, c:].highlight(color="blue")
+M[r1:, c1:].highlight(color="blue")
 ```
 
