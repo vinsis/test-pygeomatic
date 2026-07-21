@@ -36,6 +36,6 @@ gm.clear()
 r = gm.scalar(0)
 c = gm.scalar(0)
 M = gm.tex("M")
-M[r:, c:].highlight(color=blue)
+M[r:, c:].highlight(color="blue")
 ```
 
