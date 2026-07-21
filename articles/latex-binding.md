@@ -51,7 +51,7 @@ $$
 ```pygeomatic
 f = gm.tex("matmul")
 r2 = gm.scalar(0)
-c3 = gm.scalar(0)
+c3 = gm.scalar(2)
 r3 = gm.scalar(1)
 f.highlight(gm.rows == r2)
 f.highlight(gm.rows == r3, matrix = 1)
