@@ -75,8 +75,7 @@ b = gm.bool_(False)             # false gate
 t = gm.tex("pyth")
 t.underbrace.reveal(b)          # brace + "hypotenuse" hidden until b; c^2 stays
 ```
-
-Click to reveal: {the hypotenuse}(\set-bool b true)
+Click to reveal: {the hypotenuse}(b = gm.bool_(True))
 
 ---
 
@@ -93,10 +92,9 @@ $$
 gm.clear()
 k = gm.scalar(0)
 d = gm.tex("deriv")
-d.rows().reveal(rows < k)        # k = number of lines shown; k = 0 shows nothing
+d.rows().reveal(gm.rows < k)     # k = number of lines shown; k = 0 shows nothing
 ```
-
-Step: {line 1}(k = \scalar 1) · {line 2}(k = \scalar 2) · {line 3}(k = \scalar 3)
+Step: {line 1}(k = gm.scalar(1)) · {line 2}(k = gm.scalar(2)) · {line 3}(k = gm.scalar(3))
 
 ---
 
@@ -112,11 +110,4 @@ M = gm.tex("mat")
 M.reveal(M.cols() < k)           # k = number of columns shown; col j shows when k > j
 ```
 
-Build it up: {1 col}(k = \scalar 1) · {2 cols}(k = \scalar 2) · {3 cols}(k = \scalar 3)
-
-```
-M.reveal(M.rows() < k)                   # row by row; {Fill}(\animate k 3)
-M.reveal((M.rows() == 1) & b)            # a single row, gated by a bool
-M.reveal((cols - rows) <= k)             # diagonal wavefront (grow the upper triangle)
-M.reveal(M.cols() < k, matrix=1)         # the 2nd matrix in a multi-matrix formula
-```
+Build it up: {1 col}(k = gm.scalar(1)) · {2 cols}(k = gm.scalar(2)) · {3 cols}(k = gm.scalar(3))
