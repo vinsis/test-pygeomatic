@@ -69,7 +69,7 @@ $$
 a^2 + b^2 = \underbrace{c^2}_{\text{hypotenuse}}
 $$
 
-```python
+```pygeomatic
 gm.clear()
 b = gm.bool_(False)             # false gate
 t = gm.tex("pyth")
@@ -88,7 +88,7 @@ f(x) &= (x+1)^2 \\
 \end{aligned}
 $$
 
-```python
+```pygeomatic
 gm.clear()
 k = gm.scalar(0)
 d = gm.tex("deriv")
@@ -103,7 +103,7 @@ $$
 M = \begin{pmatrix} a & b & c \\ d & e & f \\ g & h & i \end{pmatrix}
 $$
 
-```python
+```pygeomatic
 gm.clear()
 k = gm.scalar(0)
 M = gm.tex("mat")
