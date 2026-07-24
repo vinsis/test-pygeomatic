@@ -10,4 +10,4 @@ jobs:
       extensions: https://tinyvolt.github.io/geomatic-math-extensions/manifest.json
       # Match the version Nova's editor installs from PyPI so preview == published output.
       # pygeomatic-ref: v0.2.1
-      pygeomatic-ref: add-texatlas-feats
+      pygeomatic-ref: add-agent-n-skills
