@@ -8,15 +8,6 @@ DSLs lean on, asks you to reason about one *program* that owns a whole tile of
 data at once. This article walks from the first model to the second, one click
 at a time.
 
-Everything below runs against a single shared store. Each numbered section calls
-`gm.clear()` first, so the five scenes are independent replays: nothing from one
-carries into the next.
-
-> *Authoring note: the visuals were designed and verified elsewhere; I only
-> grouped the commands into reveal beats and wrote the prose. The one code
-> addition is a `gm.clear()` at the top of each scene, flagged in the report,
-> which replaces the separate `gm.Store()` contexts the source used.*
-
 ## 1. One thread, one element
 
 The hardware launches a **grid** of threads, carved into fixed-size **blocks**.
@@ -24,11 +15,16 @@ In this picture the grid is a single row of eight lanes, and each lane's whole
 job is to process one slot of a one-dimensional array `A`.
 
 ```pygeomatic
-def _cell(gm, x, y, w, h):
-    """A rectangle by its bottom-left corner; returns the Polygon."""
-    bl = gm.point(x, y)
+def _cell(gm, name, x, y, w, h):
+    """A rectangle by its bottom-left corner; returns the Polygon.
+
+    Every node in a loop needs a distinct id — the article store is
+    last-write-wins, so a reused `bl`/`enc`/`tile` would collapse to one
+    node — so the caller passes a unique `name` per cell.
+    """
+    bl = gm.point(x, y, out=f"{name}-p")
     gm.hide(bl)
-    return gm.rectangle(bl, w, h)
+    return gm.rectangle(bl, w, h, out=name)
 
 gm.clear()
 unit = gm.scalar(48, out="unit")
@@ -40,33 +36,33 @@ xs = [-4.375 + 1.25 * i for i in range(n)]
 with group("s1-blocks"):
     for b in range(2):
         x0 = xs[b * 4] - 0.55
-        enc = gm.rectangle(gm.point(x0, 1.5), 4.85, 1.2)
+        enc = gm.rectangle(gm.point(x0, 1.5, out=f"s1-blkp-{b}"), 4.85, 1.2, out=f"s1-blk-{b}")
         gm.set_stroke(enc, c.AMBER)
 
 with group("s1-threads"):
     for i in range(n):
-        sq = _cell(gm, xs[i] - 0.5, 1.6, 1.0, 1.0)
+        sq = _cell(gm, f"s1-th-{i}", xs[i] - 0.5, 1.6, 1.0, 1.0)
         gm.set_stroke(sq, c.BLUE)
 
 with group("s1-data"):
     for i in range(n):
-        dc = _cell(gm, xs[i] - 0.625, -2.6, w, 1.0)
+        dc = _cell(gm, f"s1-a-{i}", xs[i] - 0.625, -2.6, w, 1.0)
         gm.set_stroke(dc, c.GRAY)
 
 with group("s1-arrows"):
     for i in range(n):
-        pt = gm.point(xs[i], 1.55)
-        pb = gm.point(xs[i], -1.55)
+        pt = gm.point(xs[i], 1.55, out=f"s1-at-{i}")
+        pb = gm.point(xs[i], -1.55, out=f"s1-ab-{i}")
         gm.hide(pt)
         gm.hide(pb)
         gm.annotate_arrow(pt, pb)
 
 with group("s1-labels"):
     for i in range(n):
-        tl = gm.annotate_text_box(f"t{i}", xs[i], 2.1, 13)
+        tl = gm.annotate_text_box(f"t{i}", xs[i], 2.1, 13, out=f"s1-tl-{i}")
         gm.set_fill(tl, c.BLUE)
     for i in range(n):
-        gm.annotate_text_box(f"A[{i}]", xs[i], -2.1, 12)
+        gm.annotate_text_box(f"A[{i}]", xs[i], -2.1, 12, out=f"s1-al-{i}")
     gm.set_fill(gm.annotate_text_box("block 0", -2.5, 3.35, 14), c.AMBER)
     gm.set_fill(gm.annotate_text_box("block 1", 2.35, 3.35, 14), c.AMBER)
 
@@ -106,12 +102,12 @@ hot = 6
 with group("s2-blocks"):
     for b in range(2):
         x0 = xs[b * 4] - 0.625 - 0.05
-        enc = gm.rectangle(gm.point(x0, -0.15), 5.1, 1.3)
+        enc = gm.rectangle(gm.point(x0, -0.15, out=f"s2-blkp-{b}"), 5.1, 1.3, out=f"s2-blk-{b}")
         gm.set_stroke(enc, c.AMBER)
 
 with group("s2-cells"):
     for i in range(n):
-        cell = _cell(gm, xs[i] - 0.625, 0.0, 1.25, 1.0)
+        cell = _cell(gm, f"s2-c-{i}", xs[i] - 0.625, 0.0, 1.25, 1.0)
         if i == hot:
             gm.set_fill(cell, c.VIOLET)
             gm.set_stroke(cell, c.VIOLET)
@@ -120,12 +116,12 @@ with group("s2-cells"):
 
 with group("s2-labels"):
     for i in range(n):
-        gm.annotate_text_box(str(i), xs[i], 0.5, 14)
+        gm.annotate_text_box(str(i), xs[i], 0.5, 14, out=f"s2-n-{i}")
     gm.set_fill(gm.annotate_text_box("block 0  (blockIdx = 0)", -2.5, -0.75, 12), c.AMBER)
     gm.set_fill(gm.annotate_text_box("block 1  (blockIdx = 1)", 2.5, -0.75, 12), c.AMBER)
 
 with group("s2-pin"):
-    tip = gm.point(xs[hot], 1.05)
+    tip = gm.point(xs[hot], 1.05, out="s2-tip")
     gm.hide(tip)
     gm.annotate_pin(tip, "global index = 6")
 
@@ -167,14 +163,14 @@ c = gm.load_colors()
 with group("s3-elements"):
     for r in range(6):
         for col in range(6):
-            el = _cell(gm, -3 + col, -3 + r, 1.0, 1.0)
+            el = _cell(gm, f"s3-e-{r}-{col}", -3 + col, -3 + r, 1.0, 1.0)
             gm.set_stroke(el, c["COLOR-GRAY-DARK"])
 
 with group("s3-tiles"):
     owner = (1, 1)
     for ti in range(3):
         for tj in range(3):
-            tile = _cell(gm, -3 + 2 * tj, -3 + 2 * ti, 2.0, 2.0)
+            tile = _cell(gm, f"s3-t-{ti}-{tj}", -3 + 2 * tj, -3 + 2 * ti, 2.0, 2.0)
             if (ti, tj) == owner:
                 gm.set_fill(tile, c.VIOLET)
                 gm.set_stroke(tile, c.VIOLET)
@@ -187,12 +183,12 @@ with group("s3-labels"):
         for tj in range(3):
             i_top = 2 - ti
             cx, cy = -2 + 2 * tj, -2 + 2 * ti
-            lab = gm.annotate_text_box(f"({i_top},{tj})", cx, cy, 13)
+            lab = gm.annotate_text_box(f"({i_top},{tj})", cx, cy, 13, out=f"s3-l-{ti}-{tj}")
             if (ti, tj) == owner:
                 gm.set_fill(lab, c.VIOLET)
 
 with group("s3-caption"):
-    tip = gm.point(0, 0)
+    tip = gm.point(0, 0, out="s3-tip")
     gm.hide(tip)
     gm.annotate_text_box(
         "Tile-based model: the matrix is partitioned into tiles; each "
@@ -230,7 +226,7 @@ hot_i, hot_j = 1, 1
 with group("s4-A"):
     for ti in range(3):
         for tk in range(3):
-            tile = _cell(gm, Ax0 + tk, Ay0 + ti, 1.0, 1.0)
+            tile = _cell(gm, f"s4-a-{ti}-{tk}", Ax0 + tk, Ay0 + ti, 1.0, 1.0)
             if ti == hot_i:
                 gm.set_fill(tile, c.TEAL)
                 gm.set_stroke(tile, c.TEAL)
@@ -240,7 +236,7 @@ with group("s4-A"):
 with group("s4-B"):
     for tk in range(3):
         for tj in range(3):
-            tile = _cell(gm, Bx0 + tj, By0 + tk, 1.0, 1.0)
+            tile = _cell(gm, f"s4-b-{tk}-{tj}", Bx0 + tj, By0 + tk, 1.0, 1.0)
             if tj == hot_j:
                 gm.set_fill(tile, c.AMBER)
                 gm.set_stroke(tile, c.AMBER)
@@ -250,7 +246,7 @@ with group("s4-B"):
 with group("s4-C"):
     for ti in range(3):
         for tj in range(3):
-            tile = _cell(gm, Cx0 + tj, Cy0 + ti, 1.0, 1.0)
+            tile = _cell(gm, f"s4-c-{ti}-{tj}", Cx0 + tj, Cy0 + ti, 1.0, 1.0)
             if (ti, tj) == (hot_i, hot_j):
                 gm.set_fill(tile, c.BLUE)
                 gm.set_stroke(tile, c.BLUE)
@@ -258,10 +254,10 @@ with group("s4-C"):
                 gm.set_stroke(tile, c["COLOR-GRAY-MID"])
 
 with group("s4-arrows"):
-    a_edge = gm.point(Ax0 + 3.0, Ay0 + hot_i + 0.5)
-    c_left = gm.point(Cx0 + hot_j, Cy0 + hot_i + 0.5)
-    b_edge = gm.point(Bx0 + hot_j + 0.5, By0)
-    c_top = gm.point(Cx0 + hot_j + 0.5, Cy0 + hot_i + 1.0)
+    a_edge = gm.point(Ax0 + 3.0, Ay0 + hot_i + 0.5, out="s4-aedge")
+    c_left = gm.point(Cx0 + hot_j, Cy0 + hot_i + 0.5, out="s4-cleft")
+    b_edge = gm.point(Bx0 + hot_j + 0.5, By0, out="s4-bedge")
+    c_top = gm.point(Cx0 + hot_j + 0.5, Cy0 + hot_i + 1.0, out="s4-ctop")
     for p in (a_edge, c_left, b_edge, c_top):
         gm.hide(p)
     gm.annotate_arrow(a_edge, c_left, 0.06)
@@ -309,8 +305,8 @@ Lx, Ly = -4.7, -1.4
 Rx, Ry = 1.9, -1.4
 
 with group("s5-divider"):
-    d1 = gm.point(0, -3.6)
-    d2 = gm.point(0, 3.0)
+    d1 = gm.point(0, -3.6, out="s5-d1")
+    d2 = gm.point(0, 3.0, out="s5-d2")
     gm.hide(d1)
     gm.hide(d2)
     div = gm.line(d1, d2)
@@ -319,7 +315,7 @@ with group("s5-divider"):
 with group("s5-left"):
     for r in range(4):
         for col in range(4):
-            el = _cell(gm, Lx + sc * col, Ly + sc * r, sc, sc)
+            el = _cell(gm, f"s5-l-{r}-{col}", Lx + sc * col, Ly + sc * r, sc, sc)
             if (r, col) == (2, 1):
                 gm.set_fill(el, c.BLUE)
                 gm.set_stroke(el, c.BLUE)
@@ -329,20 +325,20 @@ with group("s5-left"):
 with group("s5-right"):
     for r in range(4):
         for col in range(4):
-            el = _cell(gm, Rx + sc * col, Ry + sc * r, sc, sc)
+            el = _cell(gm, f"s5-r-{r}-{col}", Rx + sc * col, Ry + sc * r, sc, sc)
             gm.set_stroke(el, c["COLOR-GRAY-MID"])
-    tile = _cell(gm, Rx + sc, Ry + sc, 2 * sc, 2 * sc)
+    tile = _cell(gm, "s5-rtile", Rx + sc, Ry + sc, 2 * sc, 2 * sc)
     gm.set_fill(tile, c.VIOLET)
     gm.set_stroke(tile, c.VIOLET)
 
 with group("s5-arrows"):
-    lp1 = gm.point(Lx + sc * 1.5, 2.0)
-    lp2 = gm.point(Lx + sc * 1.5, Ly + sc * 3 + 0.05)
+    lp1 = gm.point(Lx + sc * 1.5, 2.0, out="s5-lp1")
+    lp2 = gm.point(Lx + sc * 1.5, Ly + sc * 3 + 0.05, out="s5-lp2")
     gm.hide(lp1)
     gm.hide(lp2)
     gm.annotate_arrow(lp1, lp2, 0.05, "1 thread")
-    rp1 = gm.point(Rx + sc * 2, 2.0)
-    rp2 = gm.point(Rx + sc * 2, Ry + sc * 3 + 0.05)
+    rp1 = gm.point(Rx + sc * 2, 2.0, out="s5-rp1")
+    rp2 = gm.point(Rx + sc * 2, Ry + sc * 3 + 0.05, out="s5-rp2")
     gm.hide(rp1)
     gm.hide(rp2)
     gm.annotate_arrow(rp1, rp2, 0.05, "1 program")
