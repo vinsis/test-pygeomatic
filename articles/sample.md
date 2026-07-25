@@ -1,158 +1,189 @@
-# Thales' theorem
+# pygeomatic by example
 
-Pick any point $P$ on a circle and join it to the two ends of a diameter $AB$.
-No matter where $P$ sits, the angle $\green{\angle APB}$ is exactly $90^\circ$.
-Here is the picture, built one click at a time.
-
-```pygeomatic
-unit = gm.scalar(55)
-c = gm.load_colors()
-
-# the driving angle: P sits at (3 cos theta, 3 sin theta)
-theta = gm.scalar(58)
-rad = gm.deg2rad(theta)
-cs = gm.cos(rad)
-sn = gm.sin(rad)
-px = gm.mul(cs, 3)
-py = gm.mul(sn, 3)
-
-# every piece is created up front and hidden, so each click reveals one beat
-thales = gm.circle(gm.p0, 3)
-gm.hide(thales)
-left = gm.point(-3, 0)
-right = gm.point(3, 0)
-apex = gm.point(px, py)
-gm.hide(left)
-gm.hide(right)
-gm.hide(apex)
-diameter = gm.line(left, right)
-leg_left = gm.line(apex, left)
-leg_right = gm.line(apex, right)
-gm.hide(diameter)
-gm.hide(leg_left)
-gm.hide(leg_right)
-
-with group("circle"):
-    gm.set_stroke(thales, c.GRAY)
-    gm.show(thales)
-
-with group("diameter"):
-    gm.set_stroke(diameter, c.WHITE)
-    gm.show(left)
-    gm.show(right)
-    gm.show(diameter)
-
-with group("legs"):
-    gm.set_stroke(leg_left, c.BLUE)
-    gm.set_stroke(leg_right, c.AMBER)
-    gm.set_fill(apex, c.EMERALD)
-    gm.show(apex)
-    gm.show(leg_left)
-    gm.show(leg_right)
-
-with group("trail"):
-    gm.trail(apex)
-```
-
-- Start with a {circle of radius 3}(ref:circle), centered at the origin.
-- Cut it with a {full diameter}(ref:diameter) from $A = (-3, 0)$ to $B = (3, 0)$.
-- Put $\green{P}$ on the rim and drop {two legs}(ref:legs), $\blue{PA}$ and $\amber{PB}$.
-- Ask $P$ to {leave a trail}(ref:trail) as it moves.
+A tour of the features. Every symbol here is a placeholder ($x$, $a$, $\theta$,
+$k$) and the scene is deliberately empty of meaning: a point, a segment, a
+circle. Each bullet states one thing pygeomatic can do and demonstrates it with
+the smallest live example that shows the mechanism.
 
 ```pygeomatic
-lx = gm.mul(cs, 3.7)
-ly = gm.mul(sn, 3.7)
+c = gm.load_colors()            # palette as referenceable Text nodes
+unit = gm.scalar(60)            # system node: pixels per world unit
 
-with group("labels"):
-    apex_label = gm.annotate_text_box("P", lx, ly)
-    gm.set_fill(apex_label, c.EMERALD)
-    gm.annotate_text_box("A", -3.4, -0.45)
-    gm.annotate_text_box("B", 3.4, -0.45)
+k = gm.scalar(1)                # the driving scalar everything reads from
+x = gm.mul(k, 2)                # one gm. call = exactly one DSL line
+sum_ab = gm.add(k, 1)           # underscores in the name become dashes: sum-ab
 
-with group("right-angle"):
-    gm.annotate_angle_mark(leg_left, leg_right)
+pt = gm.point(x, 1)
+seg = gm.line(gm.p0, pt)
+circ = gm.circle(gm.p0, k)
+caption = gm.text("k = ${k}")   # plain text, reactive interpolation
+gm.hide(pt)
+gm.hide(seg)
+gm.hide(circ)
 
-with group("readouts"):
-    apex_angle = gm.angle(left, apex, right)
-    theta_readout = gm.annotate_text_box("θ = ${theta}°", -3.5, 4.4)
-    gm.set_fill(theta_readout, c.VIOLET)
-    angle_readout = gm.annotate_text_box("∠APB = ${apex-angle}°", 3.3, 4.4)
-    gm.set_fill(angle_readout, c.EMERALD)
+with group("show-point"):
+    gm.set_fill(pt, c.BLUE)
+    gm.show(pt)
 
-with group("caption"):
-    gm.annotate_text_box("Thales: any point P on the circle sees the diameter AB at a right angle. Drive θ and ∠APB stays 90°.", 0, -4.6, 14, 8, -1)
+with group("show-seg"):
+    gm.set_stroke(seg, c.TEAL)
+    gm.show(seg)
+
+with group("show-circ"):
+    gm.set_stroke(circ, c.GRAY)
+    gm.show(circ)
+
+with group("label"):
+    lbl = gm.annotate_text_box(caption, -3, 3, 16)
+    gm.set_fill(lbl, c.AMBER)
+
+with group("mark"):
+    gm.annotate_pin(pt, "x")
+    gm.highlight(pt)
+
+with group("track"):
+    gm.trail(pt)
 ```
 
-- {Name the three vertices}(ref:labels) $A$, $B$ and $P$.
-- Mark the corner at $P$ with a {square angle mark}(ref:right-angle).
-- Print {two live readouts}(ref:readouts): the driver $\violet{\theta}$ and the measured $\green{\angle APB}$.
-- And a {one-line caption}(ref:caption) under the figure.
+## The `pygeomatic` fence
 
-Now drive it and watch the right-hand readout refuse to move:
+- **Python that computes and records.** A fence runs real Python at compile time;
+  each `gm.` call both evaluates numerically and appends one DSL line, so the
+  reader receives deterministic command text, never Python.
+- **One call, one line.** `gm.mul(k, 2)` is exactly `x = \mul k 2`. Repetition is
+  ordinary Python loops, not a batch API.
+- **Arithmetic.** Infix works on Scalar / Complex / Array nodes (`k + 1` records
+  `\add`), but the explicit form is always available and is the only option
+  elsewhere: `gm.add(a, b)`, `gm.pow_(a, 2)`, and nothing infix on a Point or a
+  Circle. In-place `+=` raises, so assign a new name instead.
+- **Id grammar.** Letters, digits and dashes only. An assignment target becomes
+  the id with underscores turned into dashes, so `sum_ab` above is the node
+  `sum-ab`; `out="my-id"` overrides, and engine shapes like `num0` are refused.
+- **System nodes** are already there: `gm.p0` is the origin used above as the
+  segment's first endpoint, `unit` is the zoom, `gm.T` / `gm.F` are the literals.
+- **Colors** come from `gm.load_colors()` once, then `c.BLUE`, `c.AMBER`, or
+  `c["COLOR-TEAL-LIGHT"]` for the hyphenated ramp names.
 
-- {Sweep $P$ around}(gm.animate(theta, 300)) the whole circle.
-- Or jump: {set $\theta$ to 20}(theta = gm.scalar(20)).
-- {Zoom out a little}(unit = gm.scalar(40)) to see the trail close up.
+## Reveal beats
 
-## Why it is always $90^\circ$
+A `with group(...)` block is one beat; a prose span whose target is `ref:name`
+reveals it, so the figure builds click by click and each click lands on a fully
+set-up scene.
 
-$OA$, $OP$ and $OB$ are all radii, so $\triangle OPA$ and $\triangle OPB$ are
-isosceles, and the base angle at $P$ is half of the apex angle at $O$:
+- {A point}(ref:show-point) at $(x, 1)$.
+- {A segment}(ref:show-seg) from the origin to it.
+- {A circle}(ref:show-circ) of radius $k$.
+- An {annotation box}(ref:label) whose text reads its value back live.
+- A {pin and a highlight}(ref:mark) on the point.
+- A {trail}(ref:track) that records where the point has been.
+
+Objects built as scaffolding are hidden at build time with `gm.hide` and brought
+back with `gm.show` inside the beat that earns them.
+
+## Inline CommandLinks and reactivity
+
+An inline span carrying a Python statement is a one-off command the reader
+triggers.
+Article mode is last-write-wins, so re-binding a name is a reassignment.
+
+- Reassign: {set $k$ to $2$}(k = gm.scalar(2)) or {back to $1$}(k = gm.scalar(1)).
+- Animate: {sweep $k$}(gm.animate(k, 3)) walks the value there frame by frame.
+- Everything downstream recomputes on its own: $x = 2k$ moves the point, the
+  circle radius follows $k$, and the caption interpolates `${k}` in place.
+- Any command works inline, not only assignment: {nudge it}(gm.translate(pt, 1, 0)).
+
+## texatlas: value binding
+
+Give a `$$…$$` formula an id with a `%id:` first line, take a handle with
+`gm.tex(...)`, and bind a store node into a slot. Binding replaces content, so
+every slot needs a placeholder symbol already written in the LaTeX.
 
 $$
-%id:half
-\angle OPA \;=\; \frac{\theta}{2}
-$$
-
-```pygeomatic
-half = gm.tex("half")
-half.frac.num.bind(theta, fmt=".0f")
-```
-
-The numerator is a live value slot: it shows whatever $\violet{\theta}$
-currently is, so {set $\theta$ to 100}(theta = gm.scalar(100)) rewrites the
-fraction and the drawing together.
-
-The two legs, written as column vectors out of $P$:
-
-$$
-%id:legs
-\begin{pmatrix} -3 - 3\cos\theta & 3 - 3\cos\theta \\ -3\sin\theta & -3\sin\theta \end{pmatrix}
+%id:sum-demo
+\sum_{i=1}^{n} a_i
 $$
 
 ```pygeomatic
-paint = gm.scalar(0)
-leg = gm.scalar(0)
-legs = gm.tex("legs")
-legs.highlight((gm.cols == leg).scale(paint), color="BLUE")
+s = gm.tex("sum-demo")
+s.sum.upper.bind(k, fmt="d")      # the n slot now shows k's live value
+s.sum.lower.bind(k, show="symbol")
 ```
 
-- {Paint the first column}(paint = gm.scalar(1)): that is $\blue{\vec{PA}}$.
-- {Move the paint over}(leg = gm.scalar(1)) to column two, $\amber{\vec{PB}}$.
-- Their dot product is $(9\cos^2\theta - 9) + 9\sin^2\theta = 0$, so the columns are orthogonal.
+- Legal families and slots come from the `SCHEMA` in `src/pygeomatic/tex.py`:
+  `int` / `sum` / `prod` take `lower`, `upper`, `body`; `frac` takes `num` and
+  `denom`; `sqrt` takes `body`; `underbrace` / `overbrace` are reveal-only.
+- `fmt` is `".2f"` or `"d"`, or omit it to trim to four decimals, and
+  `show="symbol"` links a slot without substituting its glyph.
+- Driving the bound node drives the formula: {upper limit $3$}(k = gm.scalar(3)).
 
-The whole argument, in four lines:
+## texatlas: matrix highlight
+
+A highlight is a predicate over a cell's grid position, never its content.
 
 $$
-%id:proof
+%id:mat-demo
+\begin{pmatrix} a & b \\ c & d \end{pmatrix}
+$$
+
+```pygeomatic
+r = gm.scalar(0)
+gate = gm.scalar(0, out="gate")
+M = gm.tex("mat-demo")
+M.highlight(gm.rows == r, color="pink")          # reactive: r drives the row
+M.diag().highlight(color="teal")                 # also .triu() / .tril()
+M[:, 1:].highlight(color="lime")                 # numpy-style region
+M.triu(1).scale(gate).highlight(color="amber")   # gated: shows once gate = 1
+```
+
+- Axes are `gm.rows`, `gm.cols`, `gm.dim(i)`; compare them with `==`, `<`, `>`
+  against an int or a node, and combine regions with `&` and `|`.
+- Move the row band: {row $0$}(r = gm.scalar(0)) or {row $1$}(r = gm.scalar(1)).
+- Open the gated highlight: {turn it on}(gate = gm.scalar(1)).
+- `matrix=N` picks the $N$-th matrix in a multi-matrix formula, counting real
+  matrices in source order and skipping `aligned`-style layout blocks.
+
+## texatlas: reveal
+
+The same selector machine, painting opacity instead of color. Use strict `<` so
+the gate counts how many parts show and $0$ shows nothing.
+
+$$
+%id:deriv-demo
 \begin{aligned}
-|OA| &= |OP| = |OB| = r \\
-\angle OPA &= \frac{\theta}{2} \\
-\angle OPB &= \frac{180^\circ - \theta}{2} \\
-\angle APB &= \underbrace{\frac{\theta}{2} + \frac{180^\circ - \theta}{2}}_{\theta \text{ cancels}} \;=\; 90^\circ
+x &= a \\
+x &= a + b \\
+x &= \theta
 \end{aligned}
 $$
 
+$$
+%id:brace-demo
+\underbrace{a + b}_{\text{label}}
+$$
+
 ```pygeomatic
-k = gm.scalar(0)
-cancel = gm.bool_(False)
-proof = gm.tex("proof")
-proof.rows().reveal(gm.rows < k)
-proof.underbrace.reveal(cancel)
+n = gm.scalar(0, out="n")
+flag = gm.bool_(False)
+d = gm.tex("deriv-demo")
+d.rows().reveal(gm.rows < n)      # n lines shown; n = 0 shows none
+br = gm.tex("brace-demo")
+br.underbrace.reveal(flag)        # brace glyph and label, all or nothing
+M.reveal(M.cols() < n)            # matrix columns fade in on the same gate
 ```
 
-- {Radii first}(k = gm.scalar(1)), then the {base angle at $A$}(k = gm.scalar(2)),
-  then the {base angle at $B$}(k = gm.scalar(3)), then the {closing sum}(k = gm.scalar(4)).
-- Or {play the whole proof}(gm.animate(k, 4)) in one go.
-- {Reveal the punchline}(cancel = gm.bool_(True)): $\theta$ cancels, so the answer
-  never depends on where $P$ sits.
+- Step the derivation: {one line}(n = gm.scalar(1)), {two}(n = gm.scalar(2)),
+  {three}(n = gm.scalar(3)), or {play it}(gm.animate(n, 3)).
+- Flip the brace on: {show the brace}(flag = gm.bool_(True)).
+- Matrix reveal is fade-only; `mode="collapse"` is available for lines and slots
+  but would break a grid.
+
+## Compiling
+
+Bindings never become DSL: they ride a separate channel and land in a trailing
+`<!-- texatlas:v1 … -->` comment. The compiler replays the whole document
+through `parse_dsl` in order, so a broken article fails the build, not the
+reader:
+
+```sh
+uv run python scripts/compile_article.py examples/agent-output.md
+```
