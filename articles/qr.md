@@ -10,8 +10,8 @@ $$
 %id:aqr
 \begin{aligned}
 A &= \begin{pmatrix} 2 & 4 \\ 3 & 1 \end{pmatrix} \\ \\
-  &= \begin{pmatrix} q_{11} & q_{21} \\ q_{12} & q_{22} \end{pmatrix}
-     \begin{pmatrix} r_{11} & r_{12} \\ 0 & r_{22} \end{pmatrix}
+  &= \underbrace{\begin{pmatrix} q_{11} & q_{21} \\ q_{12} & q_{22} \end{pmatrix}}_{\text{orthonormal }Q}
+     \underbrace{\begin{pmatrix} r_{11} & r_{12} \\ 0 & r_{22} \end{pmatrix}}_{\text{upper-triangular }R}
 \end{aligned}
 $$
 
@@ -103,7 +103,7 @@ circle as a length gauge. Nothing in $Q$ or $R$ is known yet.
 $$
 %id:q1def
 \begin{aligned}
-\amber{q_1} &= \frac{1}{\lVert a_1\rVert}\,\blue{\begin{pmatrix} 2 \\ 3 \end{pmatrix}} \\ \\
+\amber{q_1} &= \underbrace{\frac{1}{\lVert a_1\rVert}}_{\text{scale to unit length}}\,\blue{\begin{pmatrix} 2 \\ 3 \end{pmatrix}} \\ \\
 &= \amber{\begin{pmatrix} 0.5547 \\ 0.8321 \end{pmatrix}}
 \end{aligned}
 $$
@@ -117,8 +117,8 @@ $Q$'s first column lights up.
 
 $$
 %id:proj
-\teal{\text{proj}}=\frac{a_2\cdot q_1}{\lVert \amber{q_1}\rVert^{2}}\,\amber{q_1},\qquad
-\underbrace{\teal{a_2\cdot q_1}}_{=\,r_{12}}
+\teal{\text{proj}}=\teal{\frac{a_2\cdot q_1}{\lVert q_1\rVert^{2}}}\,\amber{q_1},\qquad
+\underbrace{\teal{a_2\cdot q_1}}_{=\,\teal{r_{12}}}
 $$
 
 Now split $\cyan{a_2}$ into a part along $q_1$ and a part perpendicular to it.
@@ -130,7 +130,7 @@ $$
 %id:u2def
 \begin{aligned}
 \green{u_2} &= \cyan{a_2}-\teal{\text{proj}} \\ \\
-\orange{q_2} &= \frac{1}{\lVert u_2\rVert}\,\green{\begin{pmatrix} 2.3077 \\ -1.5385 \end{pmatrix}} \\ \\
+\orange{q_2} &= \green{\frac{1}{\lVert u_2\rVert}}\,\green{\begin{pmatrix} 2.3077 \\ -1.5385 \end{pmatrix}} \\ \\
 &= \orange{\begin{pmatrix} 0.8321 \\ -0.5547 \end{pmatrix}}
 \end{aligned}
 $$
@@ -191,20 +191,20 @@ A &= \begin{pmatrix}
 -1 & 1 & 1 & 3 & 0 \\
 3 & 0 & -1 & 2 & 4
 \end{pmatrix} \\ \\
-  &= \begin{pmatrix}
+  &= \underbrace{\begin{pmatrix}
 -0.52 & 0.24 & -0.18 & -0.11 & -0.79 \\
 -0.26 & -0.84 & 0.42 & 0.12 & -0.20 \\
 0.00 & -0.43 & -0.89 & 0.18 & 0.05 \\
 0.26 & -0.23 & -0.08 & -0.93 & -0.09 \\
 -0.77 & 0.04 & -0.04 & -0.28 & 0.56
-\end{pmatrix}
-\begin{pmatrix}
+\end{pmatrix}}_{\text{orthonormal columns }Q}
+     \underbrace{\begin{pmatrix}
 -3.87 & -0.26 & 1.55 & -1.29 & -4.91 \\
 0 & -4.68 & -0.73 & 0.07 & -0.80 \\
 0 & 0 & -5.30 & 0.37 & -2.08 \\
 0 & 0 & 0 & -3.63 & -0.96 \\
 0 & 0 & 0 & 0 & -0.22
-\end{pmatrix}
+\end{pmatrix}}_{\text{upper-triangular }R}
 \end{aligned}
 $$
 
@@ -214,7 +214,7 @@ the active column of $Q$ and its matching column of $R$ light up in $\teal{teal}
 
 $$
 %id:piv5
-\text{beat}=\frac{0}{5},\qquad \lVert \teal{u_k}\rVert=\sqrt{0.0000}
+\text{beat}=\frac{0}{5},\qquad \underbrace{\sqrt{0.0000}}_{\teal{\lVert u_k\rVert}}
 $$
 
 ```pygeomatic
