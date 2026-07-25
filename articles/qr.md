@@ -194,19 +194,24 @@ A &= \begin{pmatrix}
 -1 & 1 & 1 & 3
 \end{pmatrix} \\ \\
   &= \underbrace{\begin{pmatrix}
-0.82 & -0.29 & 0.23 & 0.45 \\
-0.41 & 0.82 & -0.40 & -0.02 \\
-0.00 & 0.43 & 0.89 & -0.18 \\
--0.41 & 0.25 & 0.06 & 0.88
+\blue{0.82} & \pink{-0.29} & \green{0.23} & \amber{0.45} \\
+\blue{0.41} & \pink{0.82} & \green{-0.40} & \amber{-0.02} \\
+\blue{0.00} & \pink{0.43} & \green{0.89} & \amber{-0.18} \\
+\blue{-0.41} & \pink{0.25} & \green{0.06} & \amber{0.88}
 \end{pmatrix}}_{\text{orthonormal columns }Q}
      \underbrace{\begin{pmatrix}
-2.45 & 0.41 & -1.22 & -0.41 \\
-0 & 4.67 & 0.75 & 0.04 \\
-0 & 0 & 5.29 & -0.48 \\
-0 & 0 & 0 & 3.26
+\blue{2.45} & \blue{0.41} & \blue{-1.22} & \blue{-0.41} \\
+0 & \pink{4.67} & \pink{0.75} & \pink{0.04} \\
+0 & 0 & \green{5.29} & \green{-0.48} \\
+0 & 0 & 0 & \amber{3.26}
 \end{pmatrix}}_{\text{upper-triangular }R}
 \end{aligned}
 $$
+
+Each column of $Q$ carries its own color, $\blue{q_1}\,\pink{q_2}\,\green{q_3}\,\amber{q_4}$,
+and $R$ is tinted to match: entry $R_{ik}=q_i\cdot a_k$ takes the color of $q_i$, so the top
+$k$ entries of $R$'s $k$-th column replay, top to bottom, which earlier $q_i$'s the $k$-th
+column of $A$ leaned on before it was normalized.
 
 The left factor $Q$ starts blank and the right factor $R$ starts blank. Each click
 below builds one column: the pivot norm $\lVert u_k\rVert$ is the live readout, and
