@@ -155,3 +155,19 @@ Strict $<$ means the gate counts lines, so $k = 0$ shows nothing:
 - Or {play it through}(gm.animate(k, 4)) and let the reveal run as a sweep.
 - {Show why the length holds}(why = gm.bool_(True)): the brace and its label fade
   in over the Pythagorean identity that makes $R(\theta)$ an isometry.
+
+---
+
+$$
+%id:nest
+\begin{aligned}
+a &= \underbrace{b}_{c}
+\end{aligned}
+$$
+
+---
+
+$$
+%id:flat
+a = \underbrace{b}_{c}
+$$
