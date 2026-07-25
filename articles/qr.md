@@ -33,8 +33,11 @@ gm.hide(pa1, pa2, pq1, pq2, pproj, pu2)   # the arrows carry the visible geometr
 
 # live numeric values bound into the formulas below
 anorm = gm.scalar(3.6055513, out="anorm")   # ‖a1‖ = √13
-adotq = gm.scalar(0, out="adotq")           # a2·q1, starts 0 and fills in at the projection beat
 unorm = gm.scalar(2.7735010, out="unorm")   # ‖u2‖
+# NB: adotq (a2·q1) is intentionally NOT created here. It first exists at the
+# projection beat, so until then the bound numerator has no env value and the
+# slot shows its authored symbol a2·q1 — not a misleading 0.0000. (Binding a
+# value node that reads 0 before it is meaningful is the trap; see projbeat.)
 
 # per-beat gates that drive the formula reactivity (0 → 1 at each click)
 gate_a = gm.scalar(0, out="gate-a")       # lights q1's column of Q
@@ -65,7 +68,7 @@ with group("q1beat"):
 with group("projbeat"):
     arr_proj = gm.annotate_arrow(origin, pproj)
     gm.set_stroke(arr_proj, c.TEAL)
-    adotq = gm.scalar(3.0508510, out="adotq")  # a2·q1 fills into the frac slot
+    adotq = gm.scalar(3.0508510, out="adotq")  # a2·q1 first defined here → numerator flips from symbol to value
     gate_proj = gm.scalar(1, out="gate-proj")  # reveal a2·q1, light R's (1,2)
     lab_proj = gm.annotate_text_box("proj", 0.65, 2.75, 13)
     gm.set_fill(lab_proj, c.TEAL) # completer
@@ -174,36 +177,33 @@ u2def = gm.tex("u2def")
 u2def.frac.denom.bind(unorm, fmt=".4f")   # ‖u2‖
 ```
 
-# QR at full size: a 5×5 column-by-column build
+# QR at full size: a 4×4 column-by-column build
 
 The 2D picture was the whole algorithm in miniature. Gram–Schmidt does not care
 how many columns there are: it normalizes the first residual to $q_1$, subtracts
 that direction out of the rest, and repeats. Here is the identical move on a
-concrete $5\times5$ matrix $A$, whose real `numpy` factorization is
+concrete $4\times4$ matrix $A$, whose real `numpy` factorization is
 
 $$
 %id:qr5
 \begin{aligned}
 A &= \begin{pmatrix}
-2 & -1 & 0 & 1 & 3 \\
-1 & 4 & -2 & 0 & 1 \\
-0 & 2 & 5 & -1 & 2 \\
--1 & 1 & 1 & 3 & 0 \\
-3 & 0 & -1 & 2 & 4
+2 & -1 & 0 & 1 \\
+1 & 4 & -2 & 0 \\
+0 & 2 & 5 & -1 \\
+-1 & 1 & 1 & 3
 \end{pmatrix} \\ \\
   &= \underbrace{\begin{pmatrix}
--0.52 & 0.24 & -0.18 & -0.11 & -0.79 \\
--0.26 & -0.84 & 0.42 & 0.12 & -0.20 \\
-0.00 & -0.43 & -0.89 & 0.18 & 0.05 \\
-0.26 & -0.23 & -0.08 & -0.93 & -0.09 \\
--0.77 & 0.04 & -0.04 & -0.28 & 0.56
+0.82 & -0.29 & 0.23 & 0.45 \\
+0.41 & 0.82 & -0.40 & -0.02 \\
+0.00 & 0.43 & 0.89 & -0.18 \\
+-0.41 & 0.25 & 0.06 & 0.88
 \end{pmatrix}}_{\text{orthonormal columns }Q}
      \underbrace{\begin{pmatrix}
--3.87 & -0.26 & 1.55 & -1.29 & -4.91 \\
-0 & -4.68 & -0.73 & 0.07 & -0.80 \\
-0 & 0 & -5.30 & 0.37 & -2.08 \\
-0 & 0 & 0 & -3.63 & -0.96 \\
-0 & 0 & 0 & 0 & -0.22
+2.45 & 0.41 & -1.22 & -0.41 \\
+0 & 4.67 & 0.75 & 0.04 \\
+0 & 0 & 5.29 & -0.48 \\
+0 & 0 & 0 & 3.26
 \end{pmatrix}}_{\text{upper-triangular }R}
 \end{aligned}
 $$
@@ -214,68 +214,59 @@ the active column of $Q$ and its matching column of $R$ light up in $\teal{teal}
 
 $$
 %id:piv5
-\text{beat}=\frac{0}{5},\qquad \underbrace{\sqrt{0.0000}}_{\teal{\lVert u_k\rVert}}
+\text{beat}=\frac{0}{4},\qquad \underbrace{\sqrt{0.0000}}_{\teal{\lVert u_k\rVert}}
 $$
 
 ```pygeomatic
-gm.clear()                          # ADDED: wipe the 2D canvas for the 5×5 view
+gm.clear()                          # ADDED: wipe the 2D canvas for the 4×4 view
 
 # counters and gates driving the progressive reveal (all ADDED for this section)
 kcol5 = gm.scalar(0, out="kcol5")       # how many columns of Q and R are revealed
-step5 = gm.scalar(0, out="step5")       # beat index 0→5, shown as k/5
+step5 = gm.scalar(0, out="step5")       # beat index 0→4, shown as k/4
 pivotsq5 = gm.scalar(0, out="pivotsq5") # ‖u_k‖² of the active column (under the sqrt)
 gcol0 = gm.scalar(0, out="gcol0")       # per-column spotlight gates, one lit at a time
 gcol1 = gm.scalar(0, out="gcol1")
 gcol2 = gm.scalar(0, out="gcol2")
 gcol3 = gm.scalar(0, out="gcol3")
-gcol4 = gm.scalar(0, out="gcol4")
 
 with group("col-1"):
     step5 = gm.scalar(1, out="step5")
-    pivotsq5 = gm.scalar(15.0000, out="pivotsq5")
+    pivotsq5 = gm.scalar(6.0000, out="pivotsq5")
     gcol0 = gm.scalar(1, out="gcol0")   # spotlight the first column
     kcol5 = gm.scalar(1, out="kcol5")   # completer: Q's and R's column 1 fade in
 
 with group("col-2"):
     step5 = gm.scalar(2, out="step5")
-    pivotsq5 = gm.scalar(21.9333, out="pivotsq5")
+    pivotsq5 = gm.scalar(21.8333, out="pivotsq5")
     gcol0 = gm.scalar(0, out="gcol0")   # dim the previous column
     gcol1 = gm.scalar(1, out="gcol1")   # spotlight the second
     kcol5 = gm.scalar(2, out="kcol5")   # completer
 
 with group("col-3"):
     step5 = gm.scalar(3, out="step5")
-    pivotsq5 = gm.scalar(28.0729, out="pivotsq5")
+    pivotsq5 = gm.scalar(27.9389, out="pivotsq5")
     gcol1 = gm.scalar(0, out="gcol1")
     gcol2 = gm.scalar(1, out="gcol2")
     kcol5 = gm.scalar(3, out="kcol5")   # completer
 
 with group("col-4"):
     step5 = gm.scalar(4, out="step5")
-    pivotsq5 = gm.scalar(13.1930, out="pivotsq5")
+    pivotsq5 = gm.scalar(10.6036, out="pivotsq5")
     gcol2 = gm.scalar(0, out="gcol2")
     gcol3 = gm.scalar(1, out="gcol3")
-    kcol5 = gm.scalar(4, out="kcol5")   # completer
-
-with group("col-5"):
-    step5 = gm.scalar(5, out="step5")
-    pivotsq5 = gm.scalar(0.0487, out="pivotsq5")
-    gcol3 = gm.scalar(0, out="gcol3")
-    gcol4 = gm.scalar(1, out="gcol4")
-    kcol5 = gm.scalar(5, out="kcol5")   # completer: the last column closes Q and R
+    kcol5 = gm.scalar(4, out="kcol5")   # completer: the last column closes Q and R
 ```
 
-Same Gram–Schmidt step, five times over, one click each:
+Same Gram–Schmidt step, four times over, one click each:
 
 - {Column 1}(ref:col-1): normalize the first residual to $q_1$; its length
-  $\lVert u_1\rVert=\sqrt{15}\approx3.87$ becomes $r_{11}$.
+  $\lVert u_1\rVert=\sqrt{6}\approx2.45$ becomes $r_{11}$.
 - {Column 2}(ref:col-2): the second residual, with $q_1$ subtracted out,
   normalizes to $q_2$; its overlaps fill $R$'s second column.
 - {Column 3}(ref:col-3): $q_3$ is the third residual made orthogonal to
-  $q_1,q_2$; its pivot norm is the tallest, $\sqrt{28.07}\approx5.30$.
-- {Column 4}(ref:col-4): $q_4$ falls out once $q_1,q_2,q_3$ are projected away.
-- {Column 5}(ref:col-5): the last residual is nearly used up, so the final pivot
-  $\sqrt{0.049}\approx0.22$ is tiny, and $Q$ and $R$ are complete.
+  $q_1,q_2$; its pivot norm is the tallest, $\sqrt{27.94}\approx5.29$.
+- {Column 4}(ref:col-4): $q_4$ falls out once $q_1,q_2,q_3$ are projected away,
+  so the final pivot $\sqrt{10.60}\approx3.26$ closes $Q$ and $R$.
 
 ```pygeomatic
 qr5 = gm.tex("qr5")
@@ -287,16 +278,14 @@ qr5.highlight((gm.cols == 0).scale(gcol0), color="teal", matrix=1)
 qr5.highlight((gm.cols == 1).scale(gcol1), color="teal", matrix=1)
 qr5.highlight((gm.cols == 2).scale(gcol2), color="teal", matrix=1)
 qr5.highlight((gm.cols == 3).scale(gcol3), color="teal", matrix=1)
-qr5.highlight((gm.cols == 4).scale(gcol4), color="teal", matrix=1)
 qr5.highlight((gm.cols == 0).scale(gcol0), color="teal", matrix=2)
 qr5.highlight((gm.cols == 1).scale(gcol1), color="teal", matrix=2)
 qr5.highlight((gm.cols == 2).scale(gcol2), color="teal", matrix=2)
 qr5.highlight((gm.cols == 3).scale(gcol3), color="teal", matrix=2)
-qr5.highlight((gm.cols == 4).scale(gcol4), color="teal", matrix=2)
 
 # live scalar readouts in NON-matrix slots
 piv5 = gm.tex("piv5")
-piv5.frac.num.bind(step5, fmt=".0f")     # beat index k, shown as k/5
+piv5.frac.num.bind(step5, fmt=".0f")     # beat index k, shown as k/4
 piv5.sqrt.body.bind(pivotsq5, fmt=".4f") # ‖u_k‖ = sqrt(pivotsq5) updates each click
 ```
 
