@@ -104,6 +104,7 @@ $$
 $$
 
 ```pygeomatic
+gm.clear()
 s = gm.tex("sum-demo")
 s.sum.upper.bind(k, fmt="d")      # the n slot now shows k's live value
 s.sum.lower.bind(k, show="symbol")
@@ -126,8 +127,9 @@ $$
 $$
 
 ```pygeomatic
+gm.clear()
 r = gm.scalar(0)
-gate = gm.scalar(0, out="gate")
+gate = gm.scalar(0)
 M = gm.tex("mat-demo")
 M.highlight(gm.rows == r, color="pink")          # reactive: r drives the row
 M.diag().highlight(color="teal")                 # also .triu() / .tril()
@@ -162,13 +164,12 @@ $$
 $$
 
 ```pygeomatic
-n = gm.scalar(0, out="n")
+n = gm.scalar(0)
 flag = gm.bool_(False)
 d = gm.tex("deriv-demo")
 d.rows().reveal(gm.rows < n)      # n lines shown; n = 0 shows none
 br = gm.tex("brace-demo")
 br.underbrace.reveal(flag)        # brace glyph and label, all or nothing
-M.reveal(M.cols() < n)            # matrix columns fade in on the same gate
 ```
 
 - Step the derivation: {one line}(n = gm.scalar(1)), {two}(n = gm.scalar(2)),
