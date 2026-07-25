@@ -136,8 +136,7 @@ $$
 v' &= R(\theta)\,v \\
 x' &= x\cos\theta - y\sin\theta \\
 y' &= x\sin\theta + y\cos\theta \\
-\lVert v' \rVert^2 &= (x^2 + y^2)\underbrace{(\cos^2\theta + \sin^2\theta)}_{=\;1}
-   \;=\; \lVert v \rVert^2
+\lVert v' \rVert^2 &= \underbrace{x^2 + y^2}_{\cos^2\theta + \sin^2\theta = 1}
 \end{aligned}
 $$
 
