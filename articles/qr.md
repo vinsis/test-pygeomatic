@@ -8,9 +8,11 @@ $\cyan{a_2}=(4,1)$ and watch $Q$ and $R$ fill in click by click.
 
 $$
 %id:aqr
-A=\begin{pmatrix} 2 & 4 \\ 3 & 1 \end{pmatrix}
-=\begin{pmatrix} q_{11} & q_{21} \\ q_{12} & q_{22} \end{pmatrix}
-\begin{pmatrix} r_{11} & r_{12} \\ 0 & r_{22} \end{pmatrix}
+\begin{aligned}
+A &= \begin{pmatrix} 2 & 4 \\ 3 & 1 \end{pmatrix} \\ \\
+  &= \begin{pmatrix} q_{11} & q_{21} \\ q_{12} & q_{22} \end{pmatrix}
+     \begin{pmatrix} r_{11} & r_{12} \\ 0 & r_{22} \end{pmatrix}
+\end{aligned}
 $$
 
 ```pygeomatic
@@ -100,8 +102,10 @@ circle as a length gauge. Nothing in $Q$ or $R$ is known yet.
 
 $$
 %id:q1def
-q_1=\frac{1}{\lVert a_1\rVert}\begin{pmatrix} 2 \\ 3 \end{pmatrix}
-=\begin{pmatrix} 0.5547 \\ 0.8321 \end{pmatrix}
+\begin{aligned}
+\amber{q_1} &= \frac{1}{\lVert a_1\rVert}\,\blue{\begin{pmatrix} 2 \\ 3 \end{pmatrix}} \\ \\
+&= \amber{\begin{pmatrix} 0.5547 \\ 0.8321 \end{pmatrix}}
+\end{aligned}
 $$
 
 The first column of $Q$ is just $a_1$ rescaled to length one. {Normalize to
@@ -113,20 +117,22 @@ $Q$'s first column lights up.
 
 $$
 %id:proj
-\text{proj}=\frac{a_2\!\cdot q_1}{\lVert q_1\rVert^{2}}\,q_1,\qquad
-\underbrace{a_2\!\cdot q_1}_{=\,r_{12}}
+\teal{\text{proj}}=\frac{a_2\cdot q_1}{\lVert \amber{q_1}\rVert^{2}}\,\amber{q_1},\qquad
+\underbrace{\teal{a_2\cdot q_1}}_{=\,r_{12}}
 $$
 
 Now split $\cyan{a_2}$ into a part along $q_1$ and a part perpendicular to it.
 {Project $\cyan{a_2}$ onto $\amber{q_1}$}(ref:projbeat): the teal arrow slides
-along $q_1$, and the live inner product $\teal{a_2\!\cdot q_1}$ fills into the
+along $q_1$, and the live inner product $\teal{a_2\cdot q_1}$ fills into the
 numerator, this is $r_{12}$.
 
 $$
 %id:u2def
-u_2=a_2-\text{proj},\qquad
-q_2=\frac{1}{\lVert u_2\rVert}\begin{pmatrix} 2.3077 \\ -1.5385 \end{pmatrix}
-=\begin{pmatrix} 0.8321 \\ -0.5547 \end{pmatrix}
+\begin{aligned}
+\green{u_2} &= \cyan{a_2}-\teal{\text{proj}} \\ \\
+\orange{q_2} &= \frac{1}{\lVert u_2\rVert}\,\green{\begin{pmatrix} 2.3077 \\ -1.5385 \end{pmatrix}} \\ \\
+&= \orange{\begin{pmatrix} 0.8321 \\ -0.5547 \end{pmatrix}}
+\end{aligned}
 $$
 
 What is left over is orthogonal to $q_1$. The {residual $\green{u_2}$}(ref:u2beat)
@@ -177,14 +183,15 @@ concrete $5\times5$ matrix $A$, whose real `numpy` factorization is
 
 $$
 %id:qr5
-A=\begin{pmatrix}
+\begin{aligned}
+A &= \begin{pmatrix}
 2 & -1 & 0 & 1 & 3 \\
 1 & 4 & -2 & 0 & 1 \\
 0 & 2 & 5 & -1 & 2 \\
 -1 & 1 & 1 & 3 & 0 \\
 3 & 0 & -1 & 2 & 4
-\end{pmatrix}
-=\begin{pmatrix}
+\end{pmatrix} \\ \\
+  &= \begin{pmatrix}
 -0.52 & 0.24 & -0.18 & -0.11 & -0.79 \\
 -0.26 & -0.84 & 0.42 & 0.12 & -0.20 \\
 0.00 & -0.43 & -0.89 & 0.18 & 0.05 \\
@@ -198,6 +205,7 @@ A=\begin{pmatrix}
 0 & 0 & 0 & -3.63 & -0.96 \\
 0 & 0 & 0 & 0 & -0.22
 \end{pmatrix}
+\end{aligned}
 $$
 
 The left factor $Q$ starts blank and the right factor $R$ starts blank. Each click
@@ -206,7 +214,7 @@ the active column of $Q$ and its matching column of $R$ light up in $\teal{teal}
 
 $$
 %id:piv5
-\text{beat}=\frac{0}{5},\qquad \lVert u_k\rVert=\sqrt{0.0000}
+\text{beat}=\frac{0}{5},\qquad \lVert \teal{u_k}\rVert=\sqrt{0.0000}
 $$
 
 ```pygeomatic
