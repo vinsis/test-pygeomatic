@@ -5,7 +5,11 @@ Test
 ```pygeomatic
 c = gm.circle(gm.p0, 1)
 label = gm.annotate_text_box("click me", 2, 2, 18)
+```
 
+- highlight {circle}(gm.highlight(c))
+
+```pygeomatic
 with gm.ui.onclick(label):
     p = gm.point(2, 2)
     d = gm.distance(p, gm.p0)
