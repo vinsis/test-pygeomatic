@@ -1,5 +1,7 @@
 # Click the label
 
+Test
+
 ```pygeomatic
 c = gm.circle(gm.p0, 1)
 label = gm.annotate_text_box("click me", 2, 2, 18)
