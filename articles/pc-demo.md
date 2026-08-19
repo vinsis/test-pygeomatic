@@ -7,7 +7,8 @@ c = gm.circle(gm.p0, 1)
 label = gm.annotate_text_box("click me", 2, 2, 18)
 ```
 
-- highlight {circle}(gm.highlight(c))
+Let us highlight the {circle}(gm.highlight(c)) so that all previous commands run. 
+- this is a bullet point. is it being rendered?
 
 ```pygeomatic
 with gm.ui.onclick(label):
