@@ -10,4 +10,4 @@ jobs:
       extensions: https://tinyvolt.github.io/geomatic-math-extensions/manifest.json
       # Match the version Nova's editor installs from PyPI so preview == published output.
       # pygeomatic-ref: v0.4
-      pygeomatic-ref: remove-guard
+      pygeomatic-ref: fix-misc-issues
