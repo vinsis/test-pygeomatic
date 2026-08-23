@@ -9,4 +9,6 @@ w2 = gm.ui.radio([0,1],0,'w2')
 gm.md(f'{w0}{w1}{w2}')
 ```
 
+{hi}(gm.highlight(gm.p0))
+
 
