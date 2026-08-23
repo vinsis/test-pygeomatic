@@ -3,12 +3,10 @@
 Test
 
 ```pygeomatic
-with gm.onpageload():
-  txt = gm.annotate_text_box('enlarge', 0, 6, 12, -1)
-  r = gm.ui.slider(1,10,0.5,2,'radius')
-  c = gm.circle(gm.p0, r)
-  with gm.ui.onclick(txt):
-    r = gm.scalar(3)
+w0 = gm.ui.radio([0,1],0,'w0')
+w1 = gm.ui.radio([0,1],0,'w1')
+w2 = gm.ui.radio([0,1],0,'w2')
+gm.md(f'{w0}{w1}{w2}')
 ```
 
 Let us highlight the {circle}(gm.highlight(c)) so that all previous commands run. 
